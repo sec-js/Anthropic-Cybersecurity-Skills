@@ -1,0 +1,44 @@
+name: Run tests
+
+on:
+  push:
+    paths:
+      - 'skills/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'pytest.ini'
+      - 'requirements-dev.txt'
+  pull_request:
+    paths:
+      - 'skills/**'
+      - 'scripts/**'
+      - 'tests/**'
+      - 'pytest.ini'
+      - 'requirements-dev.txt'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    name: Unit tests
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          # cffi is required to fix the cryptography native extension on some hosts
+          pip install cffi
+
+      - name: Run tests
+        run: pytest --tb=short -q
+
+      - name: Run tests with coverage
+        run: |
+          pip install pytest-cov
+          pytest --cov=scripts --cov-report=term-missing --cov-fail-under=80 -q
