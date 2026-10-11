@@ -3,6 +3,9 @@ teams/
 node_modules/
 __pycache__/
 *.py[cod]
+.coverage
+htmlcov/
+.pytest_cache/
 *.bin
 *.pt
 *.safetensors
