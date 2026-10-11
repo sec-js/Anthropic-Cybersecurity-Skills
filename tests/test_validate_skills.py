@@ -276,3 +276,38 @@ class TestRealSkillsTree:
         skills_root = Path(__file__).parent.parent / "skills"
         dups = find_duplicate_names(str(skills_root))
         assert dups == [], f"Duplicate skill names found: {dups}"
+
+
+# ---------------------------------------------------------------------------
+# OSError handling — collect_skill_names and validate_all
+# ---------------------------------------------------------------------------
+
+
+import scripts.validate_skills as _vs_mod
+
+
+class TestOSErrorHandling:
+    def test_collect_skill_names_skips_unreadable_file(self, tmp_path):
+        from unittest.mock import patch
+
+        skill_dir = tmp_path / "my-skill"
+        skill_dir.mkdir()
+        (skill_dir / "SKILL.md").write_text("content")
+
+        with patch.object(_vs_mod.Path, "read_text", side_effect=OSError("denied")):
+            names = collect_skill_names(str(tmp_path))
+
+        assert names == []
+
+    def test_validate_all_records_error_for_unreadable_file(self, tmp_path):
+        from unittest.mock import patch
+
+        skill_dir = tmp_path / "my-skill"
+        skill_dir.mkdir()
+        (skill_dir / "SKILL.md").write_text("content")
+
+        with patch.object(_vs_mod.Path, "read_text", side_effect=OSError("denied")):
+            errors, checked = validate_all(str(tmp_path))
+
+        assert checked == 1
+        assert any("Cannot read file" in e for e in errors)

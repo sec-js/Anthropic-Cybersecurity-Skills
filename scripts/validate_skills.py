@@ -140,7 +140,7 @@ def validate_all(skills_root: str) -> tuple[list[str], int]:
 # CLI
 # ---------------------------------------------------------------------------
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     import argparse
 
     parser = argparse.ArgumentParser(description="Validate SKILL.md files")
